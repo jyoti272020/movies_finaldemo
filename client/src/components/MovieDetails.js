@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { Container, Form } from "reactstrap";
+import axios from 'axios';
 
 export default function BookingPage() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
+  const [ name, setName ] = useState('');
+	const [ amount, setAmount ] = useState('');
   const { movieId } = useParams();
   const history = useHistory();
 
@@ -14,7 +17,7 @@ export default function BookingPage() {
 
   function getMovieDetail() {
     setLoading(true);
-    fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=33c89a65`)
+    fetch(`http://localhost:5000/getMovies/${movieId}`)
       .then((response) => response.json())
       .then((result) => {
         setLoading(false);
@@ -26,9 +29,19 @@ export default function BookingPage() {
       });
   }
 
-  function onClickBook() {
-    alert("Ticket Booked");
-  }
+ async function onClickBook() {
+      axios
+        .post(`http://localhost:5000/ticketBook`, {
+          name, 
+          amount
+        })
+        .then((res) => {
+          console.log(res);
+                  console.log(res.data);
+                  alert('Ticket booked succesfully');
+        });
+    }
+  
   return (
     <Container>
       {loading ? (
@@ -52,19 +65,24 @@ export default function BookingPage() {
                 *
               </span>
             </label>
-            <input id="name" required="" type="text" />
+            <input id="name" required="" type="text" 
+            onChange={(e)=>{
+              setName(e.target.value)
+            }}/>
             <label for="name">
               Amount
               <span aria-hidden="true" required="">
                 *
               </span>
             </label>
-            <input id="name" required="" type="text" />
+            <input id="name" required="" type="text" onChange={(e)=>{
+              setAmount(e.target.value)
+            }} />
             <button
               type="button"
               color="btn btn-primary"
               className="btn btn btn-primary -margin m-2"
-              onClick={onClickBook}
+               onClick={onClickBook}
             >
               Book Ticket
             </button>
